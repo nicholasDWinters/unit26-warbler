@@ -1,5 +1,5 @@
 import os
-
+import pdb
 from flask import Flask, render_template, request, flash, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
@@ -112,8 +112,10 @@ def login():
 @app.route('/logout')
 def logout():
     """Handle logout of user."""
-
-    # IMPLEMENT THIS
+    do_logout()
+    flash("Goodbye!", "success")
+    return redirect ('/login')
+    
 
 
 ##############################################################################
@@ -162,6 +164,7 @@ def show_following(user_id):
         return redirect("/")
 
     user = User.query.get_or_404(user_id)
+    
     return render_template('users/following.html', user=user)
 
 
