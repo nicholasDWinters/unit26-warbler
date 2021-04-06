@@ -209,6 +209,20 @@ def stop_following(follow_id):
 
     return redirect(f"/users/{g.user.id}/following")
 
+@app.route('/users/add_like/<int:msg_id>', methods = ['POST'])
+def add_like(msg_id):
+    '''add message to user's likes'''
+    if not g.user:
+        flash("Unauthorized action.", "danger")
+        return redirect("/")
+    liked_message = Message.query.get_or_404(msg_id)
+    if liked_message in g.user.likes:
+        g.user.likes.remove(liked_message)
+    else:
+        g.user.likes.append(liked_message)
+    db.session.commit()
+    
+    return redirect('/')
 
 @app.route('/users/profile', methods=["GET", "POST"])
 def profile():
@@ -323,12 +337,15 @@ def homepage():
 
     if g.user:
         followed_ids = [g.user.id]
+        liked_messages = []
         for user in g.user.following:
             followed_ids.append(user.id)
+        for message in g.user.likes:
+            liked_messages.append(message.id)
         
         messages = (Message.query.filter(Message.user_id.in_(followed_ids)).order_by(Message.timestamp.desc()).limit(100).all())
 
-        return render_template('home.html', messages=messages)
+        return render_template('home.html', messages=messages, likes=liked_messages)
 
     else:
         return render_template('home-anon.html')
