@@ -223,7 +223,7 @@ def profile():
     if form.validate_on_submit():
        
         is_user = User.authenticate(user.username, form.password.data)
-        
+
         if is_user:
             
             user.username = form.username.data
@@ -322,11 +322,11 @@ def homepage():
     """
 
     if g.user:
-        messages = (Message
-                    .query
-                    .order_by(Message.timestamp.desc())
-                    .limit(100)
-                    .all())
+        followed_ids = [g.user.id]
+        for user in g.user.following:
+            followed_ids.append(user.id)
+        
+        messages = (Message.query.filter(Message.user_id.in_(followed_ids)).order_by(Message.timestamp.desc()).limit(100).all())
 
         return render_template('home.html', messages=messages)
 
