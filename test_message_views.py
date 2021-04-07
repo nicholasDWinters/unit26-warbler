@@ -7,7 +7,6 @@
 
 import os
 from unittest import TestCase
-from app import do_logout, add_user_to_g
 from models import db, connect_db, Message, User
 
 # BEFORE we import our app, let's set an environmental variable

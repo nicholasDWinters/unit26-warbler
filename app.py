@@ -265,7 +265,7 @@ def profile():
             return redirect('/')
 
 
-    return render_template('users/edit.html', form=form)
+    return render_template('users/edit.html', form=form, user = user)
     
 
 
@@ -332,7 +332,7 @@ def messages_destroy(message_id):
     if g.user.id != msg.user_id:
         flash("Access unauthorized.", "danger")
         return redirect("/")
-        
+
     db.session.delete(msg)
     db.session.commit()
 
@@ -350,7 +350,7 @@ def homepage():
     - anon users: no messages
     - logged in: 100 most recent messages of followed_users
     """
-
+    
     if g.user:
         followed_ids = [g.user.id]
         liked_messages = []
@@ -359,8 +359,9 @@ def homepage():
         for message in g.user.likes:
             liked_messages.append(message.id)
         
-        messages = (Message.query.filter(Message.user_id.in_(followed_ids)).order_by(Message.timestamp.desc()).limit(100).all())
+        
 
+        messages = Message.query.filter(Message.user_id.in_(followed_ids)).order_by(Message.timestamp.desc()).limit(100).all()
         return render_template('home.html', messages=messages, likes=liked_messages)
 
     else:
