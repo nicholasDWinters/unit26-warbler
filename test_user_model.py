@@ -88,3 +88,33 @@ class UserModelTestCase(TestCase):
         self.assertFalse(self.u2.is_following(self.u1))
         self.assertTrue(self.u2.is_followed_by(self.u1))
         self.assertFalse(self.u1.is_followed_by(self.u2))
+
+    
+    def test_failed_user(self):
+        '''test to make sure it doesn't create a user if username, email, or password are not passed thru correctly'''
+        
+        user3 = User.signup(None, "test@test.com", "password", None)
+        uid = 3
+        user3.id = uid
+        with self.assertRaises(exc.IntegrityError) as context:
+            db.session.commit()
+
+        db.session.rollback()
+
+        user4 = User.signup("testtest", None, "password", None)
+        uid = 4
+        user4.id = uid
+        with self.assertRaises(exc.IntegrityError) as context:
+            db.session.commit()
+
+        self.assertRaises(ValueError, User.signup, "testtest", "email@email.com", "", None)
+        self.assertRaises(ValueError, User.signup, "testtest", "email@email.com", None, None)
+        
+
+    def test_authentication(self):
+        '''test the authentication of an existing user, testing with a wrong username, and testing with wrong password'''
+        u = User.authenticate('testuser', 'HASHED_PASSWORD')
+        self.assertEqual(u.id, self.u1.id)
+
+        self.assertFalse(User.authenticate('testuserwrong', 'HASHED_PASSWORD'))
+        self.assertFalse(User.authenticate('testuser', 'WRONG_PASSWORD'))
