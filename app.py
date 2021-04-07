@@ -1,6 +1,6 @@
 import os
 import pdb
-from flask import Flask, render_template, request, flash, redirect, session, g
+from flask import Flask, render_template, request, flash, redirect, session, g, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
@@ -220,6 +220,8 @@ def show_likes(user_id):
             liked_messages.append(message.id)
     return render_template('users/likes.html', user=user, likes = liked_messages)
 
+
+
 @app.route('/users/add_like/<int:msg_id>', methods = ['POST'])
 def add_like(msg_id):
     '''add message to user's likes'''
@@ -232,8 +234,11 @@ def add_like(msg_id):
     else:
         g.user.likes.append(liked_message)
     db.session.commit()
-    
+
     return redirect('/')
+    # return redirect('/')
+
+
 
 @app.route('/users/profile', methods=["GET", "POST"])
 def profile():
